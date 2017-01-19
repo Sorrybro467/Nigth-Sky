@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="75" height="75" tilewidth="32" tileheight="32" nextobjectid="14">
+ <tileset firstgid="1" name="tile set" tilewidth="32" tileheight="32" tilecount="768" columns="32">
+  <image source="tile set.png" width="1024" height="768"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="75" height="75">
+  <data encoding="base64" compression="zlib">
+   eJzt0jkBgDAUBcGgJoARDiMc/gXwDJB6il9sMf32qbU5LWlNvfzrLe3pSGd56Cvd6UlveWjpcd3S47qlx3VLj+uWHtctPa5bely39Lhu6XHd0uO6pcd1S4/rlh7XLT2uW3pct/S4bulx3dLjuqXHdUuP65Ye1y09rlt6XLf0uG7pcd3S47qlx3VLj+uWHtctPa5bely39Lhu6XHd0uO6pcd1S4/rlh7XLT2uW3pct/S4bulx3dLjuqXHdUuP65Ye1y09rlt6XLf0uG7pcd3S47qlx3VLj+uWHtctPa5bely39Lhu6XHd0uO6pcd1S4/rlh7XLT2uW3pct/S4bulx3dLjuqXHdUuP65Ye1y09rlt6XLf0uO4PcJhO6A==
+  </data>
+ </layer>
+ <objectgroup name="world border">
+  <object id="13" x="0" y="0">
+   <polyline points="0,0 2400,0 2400,2400 0,2400 0,8"/>
+  </object>
+ </objectgroup>
+ <layer name="land" width="75" height="75">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20Hb6AAAAAAAAAAAAAAAAAAAAAAAAAAAACAxwBX5AAB
+  </data>
+ </layer>
+</map>
