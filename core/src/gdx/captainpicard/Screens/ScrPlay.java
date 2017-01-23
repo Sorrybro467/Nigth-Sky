@@ -1,12 +1,14 @@
-package ds.captainpicard;
+package gdx.captainpicard.Screens;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -17,12 +19,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import ds.captainpicard.utils.TiledObjUtils;
+import gdx.captainpicard.utils.CameraStyles;
+import gdx.captainpicard.utils.TiledObjUtils;
 
-import static ds.captainpicard.utils.Constants.PPM;
+import static gdx.captainpicard.utils.Constants.PPM;
 
-public class CaptianPicard extends ApplicationAdapter {
+import gdx.captainpicard.GamMenu;
 
+public class ScrPlay extends ApplicationAdapter implements Screen {
+
+    GamMenu gamMenu;
     private boolean DEBUG = false;
     private final float SCALE = 2.0f;
     private OrthographicCamera camera;
@@ -33,9 +39,11 @@ public class CaptianPicard extends ApplicationAdapter {
     private Body player, Platform;
     private SpriteBatch Batch;
     private Texture tex;
+    private MapProperties MapPro;
+    private int nWidht, nHeight, nJumps;
 
-    @Override
-    public void create() {
+    public ScrPlay(GamMenu _gamMenu) {  //Referencing the main class.
+        gamMenu = _gamMenu;
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
@@ -53,25 +61,13 @@ public class CaptianPicard extends ApplicationAdapter {
 
         map = new TmxMapLoader().load("world map.tmx");
         tmr = new OrthogonalTiledMapRenderer(map);
+        MapPro = map.getProperties();
+        nWidht = MapPro.get("width", Integer.class);
+        nHeight = MapPro.get("height", Integer.class);
+
 
         TiledObjUtils.parsedTiledObjectLayer(world, map.getLayers().get("world border").getObjects());
-    }
-
-    @Override
-    public void render() {
-        update(Gdx.graphics.getDeltaTime());
-
-        //Render
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        tmr.render();
-        Batch.begin();
-        Batch.draw(tex, player.getPosition().x * PPM - (tex.getWidth() / 2), player.getPosition().y * PPM - (tex.getWidth() / 2));
-        Batch.end();
-
-
-
-        b2dr.render(world, camera.combined.scl(PPM));
+        TiledObjUtils.parsedTiledObjectLayer(world, map.getLayers().get("land").getObjects());
     }
 
     @Override
@@ -91,6 +87,9 @@ public class CaptianPicard extends ApplicationAdapter {
     public void update(float Delta) {
         world.step(1 / 60f, 6, 2);
 
+        float fstartX = camera.viewportWidth / 2;
+        float fstartY = camera.viewportHeight / 2;
+        CameraStyles.boundary(camera, fstartX, fstartY, nWidht * 75 - fstartX * 2, nHeight * 75 - fstartY * 2);
         CameraUpdate(Delta);
         InputUpdate(Delta);
         tmr.setView(camera);
@@ -106,16 +105,17 @@ public class CaptianPicard extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             horizontalForce += 1;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && nJumps == 0) {
             player.applyForceToCenter(0, 300, false);
+            nJumps++;
         }
         player.setLinearVelocity(horizontalForce * 5, player.getLinearVelocity().y);
     }
 
     public void CameraUpdate(float Delta) {
         Vector3 position = camera.position;
-        position.x = player.getPosition().x * PPM;
-        position.y = player.getPosition().y * PPM;
+        position.x = camera.position.x + (player.getPosition().x * PPM - camera.position.x) * .1f;
+        position.y = camera.position.y + (player.getPosition().y * PPM - camera.position.y) * .1f;
         camera.position.set(position);
 
         camera.update();
@@ -142,5 +142,32 @@ public class CaptianPicard extends ApplicationAdapter {
         pBody.createFixture(shape, 1.0f);
         shape.dispose();
         return pBody;
+    }
+
+    @Override
+    public void show() {
+        //   throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void render(float fDelta) {
+
+        update(fDelta);
+
+        //Render
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        tmr.render();
+        Batch.begin();
+        Batch.draw(tex, player.getPosition().x * PPM - (tex.getWidth() / 2), player.getPosition().y * PPM - (tex.getWidth() / 2));
+        Batch.end();
+
+
+        b2dr.render(world, camera.combined.scl(PPM));
+    }
+
+    @Override
+    public void hide() {
+        //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
