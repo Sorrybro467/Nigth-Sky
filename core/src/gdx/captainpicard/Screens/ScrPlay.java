@@ -1,5 +1,6 @@
 package gdx.captainpicard.Screens;
 
+import ContactListeners.MyContactListeners;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -17,12 +19,14 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import gdx.captainpicard.utils.CameraStyles;
 import gdx.captainpicard.utils.TiledObjUtils;
 
 import static gdx.captainpicard.utils.Constants.PPM;
+import static gdx.captainpicard.utils.Constants.jumps;
 
 import gdx.captainpicard.GamMenu;
 
@@ -36,28 +40,32 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
     private TiledMap map;
     private Box2DDebugRenderer b2dr;
     private World world;
-    private Body player, Platform;
+    public static Body player;
+    private Body Platform;
     private SpriteBatch Batch;
     private Texture tex;
     private MapProperties MapPro;
-    private int nWidht, nHeight, nJumps;
+    private int nWidht, nHeight;
+    private Body land;
+    private TiledObjUtils tou;
 
     public ScrPlay(GamMenu _gamMenu) {  //Referencing the main class.
         gamMenu = _gamMenu;
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
-
+        tou = new TiledObjUtils();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, w / SCALE, h / SCALE);
 
         world = new World(new Vector2(0, -9.8f), false);
+        world.setContactListener(new MyContactListeners());
         b2dr = new Box2DDebugRenderer();
 
-        player = createBox(140, 140, 32, 32, false);
-        Platform = createBox(140, 130, 64, 32, true);
+        player = createBox(200, 140, 32, 32, false);
+        //Platform = createBox(140, 130, 64, 32, true);
 
         Batch = new SpriteBatch();
-        tex = new Texture("cat.png");
+        tex = new Texture("nyan cat.png");
 
         map = new TmxMapLoader().load("world map.tmx");
         tmr = new OrthogonalTiledMapRenderer(map);
@@ -65,9 +73,10 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
         nWidht = MapPro.get("width", Integer.class);
         nHeight = MapPro.get("height", Integer.class);
 
-
-        TiledObjUtils.parsedTiledObjectLayer(world, map.getLayers().get("world border").getObjects());
-        TiledObjUtils.parsedTiledObjectLayer(world, map.getLayers().get("land").getObjects());
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("world border").getObjects(), false,false);
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("land").getObjects(), true,false);
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("levels border").getObjects(), true,false);
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("jumps pad").getObjects(), true,true);
     }
 
     @Override
@@ -86,10 +95,10 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
 
     public void update(float Delta) {
         world.step(1 / 60f, 6, 2);
-
+        CameraStyles.lerptotarget(camera, player.getPosition().scl(32));
         float fstartX = camera.viewportWidth / 2;
         float fstartY = camera.viewportHeight / 2;
-        CameraStyles.boundary(camera, fstartX, fstartY, nWidht * 75 - fstartX * 2, nHeight * 75 - fstartY * 2);
+        CameraStyles.boundary(camera, fstartX, fstartY, nWidht * 32 - fstartX * 2, nHeight * 32 - fstartY * 2);
         CameraUpdate(Delta);
         InputUpdate(Delta);
         tmr.setView(camera);
@@ -97,29 +106,24 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
     }
 
     public void InputUpdate(float delta) {
+        boolean godmode = false;
         int horizontalForce = 0;
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            horizontalForce -= 1;
+            horizontalForce -= 4;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            horizontalForce += 1;
+            horizontalForce += 4;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && nJumps == 0) {
-            player.applyForceToCenter(0, 300, false);
-            nJumps++;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && jumps == 0) {
+            player.applyForceToCenter(0, 600, false);
+            jumps = 1;
         }
+
         player.setLinearVelocity(horizontalForce * 5, player.getLinearVelocity().y);
     }
 
     public void CameraUpdate(float Delta) {
-        Vector3 position = camera.position;
-        position.x = camera.position.x + (player.getPosition().x * PPM - camera.position.x) * .1f;
-        position.y = camera.position.y + (player.getPosition().y * PPM - camera.position.y) * .1f;
-        camera.position.set(position);
-
-        camera.update();
-
     }
 
     public Body createBox(int x, int y, int widht, int height, boolean IsStatic) {
@@ -132,6 +136,7 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
             def.type = BodyDef.BodyType.DynamicBody;
         }
 
+        FixtureDef fixturedef = new FixtureDef();
         def.position.set(x / PPM, y / PPM);
         def.fixedRotation = true;
         pBody = world.createBody(def);
@@ -139,7 +144,7 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(widht / 2 / PPM, height / 2 / PPM);
 
-        pBody.createFixture(shape, 1.0f);
+        pBody.createFixture(shape, 1.0f).setUserData(this);
         shape.dispose();
         return pBody;
     }
@@ -162,7 +167,6 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
         Batch.draw(tex, player.getPosition().x * PPM - (tex.getWidth() / 2), player.getPosition().y * PPM - (tex.getWidth() / 2));
         Batch.end();
 
-
         b2dr.render(world, camera.combined.scl(PPM));
     }
 
@@ -170,4 +174,7 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
     public void hide() {
         //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+  
+
 }
