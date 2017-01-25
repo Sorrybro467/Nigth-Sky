@@ -38,10 +38,10 @@ public class GamMenu extends Game {
         updateState(0);
     }
 
-    @Override
-    public void render() {
-        super.render();
-    }
+  //  @Override
+    //public void render() {
+//        super.render();
+   // }
 
     @Override
     public void dispose() {

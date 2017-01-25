@@ -7,11 +7,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
+ //import gdx.captainpicard.Screens.ScrPlay.player;
 public class TiledObjUtils {
 
-    public static void parsedTiledObjectLayer(World world, MapObjects objects) {
+    public Body body;
+    private BodyDef bdef;
+    private FixtureDef FixDef;
+
+    public TiledObjUtils() {
+    }
+
+    public void parsedTiledObjectLayer(World world, MapObjects objects,boolean isJumped,boolean isBonce) {
         for (MapObject object : objects) {
             Shape shape;
             if (object instanceof PolylineMapObject) {
@@ -19,16 +29,34 @@ public class TiledObjUtils {
             } else {
                 continue;
             }
-            Body body;
-            BodyDef bdef = new BodyDef();
+           if (isJumped==false){
+                bdef = new BodyDef();
+            
             bdef.type = BodyDef.BodyType.StaticBody;
             body = world.createBody(bdef);
-            body.createFixture(shape, 1.0f);
+            //FixDef = new FixtureDef();
+            //FixDef.shape = shape;
+           // FixDef.density = 1.0f;
+            body.createFixture(shape,1.0f);
             shape.dispose();
+           }else if(isJumped==true) {
+                bdef = new BodyDef();
+            
+            bdef.type = BodyDef.BodyType.StaticBody;
+            body = world.createBody(bdef);
+            FixDef = new FixtureDef();
+            FixDef.shape = shape;
+            FixDef.density = 1.0f;
+            body.createFixture(FixDef).setUserData(this);
+            shape.dispose();
+            if (isBonce=true){
+               //  player.applyForceToCenter(0, 600, false);
+            }
+           }
         }
     }
 
-    private static ChainShape createPolyline(PolylineMapObject polyline) {
+    private ChainShape createPolyline(PolylineMapObject polyline) {
         float[] vertices = polyline.getPolyline().getTransformedVertices();
         Vector2[] worldvertices = new Vector2[vertices.length / 2];
 
@@ -42,4 +70,3 @@ public class TiledObjUtils {
         return cs;
     }
 }
-
