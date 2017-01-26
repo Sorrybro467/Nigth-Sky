@@ -46,7 +46,7 @@ public class ScrGameover implements Screen, InputProcessor {
         Gdx.input.setInputProcessor(stage);
         btnMenuListener();
         btnPlayListener();
-        txgg = new Texture("gameoever.jpg");
+        txgg = new Texture("gameoever.jpg");//gameover picture
     }
 
     public void render(float delta) {

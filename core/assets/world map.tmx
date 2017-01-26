@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="75" height="75" tilewidth="32" tileheight="32" nextobjectid="93">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="75" height="75" tilewidth="32" tileheight="32" nextobjectid="104">
  <tileset firstgid="1" name="tile set" tilewidth="32" tileheight="32" tilecount="768" columns="32">
   <image source="tile set.png" width="1024" height="768"/>
  </tileset>
@@ -72,38 +72,38 @@
   </data>
  </layer>
  <objectgroup name="jumps pad">
-  <object id="81" x="2304.36" y="2272.55">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="93" x="64" y="2080">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="82" x="63.8182" y="1697.02">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="94" x="64" y="1696">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="84" x="63.6818" y="1312.75">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="95" x="64" y="1312">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="85" x="2304.07" y="1888.7">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="96" x="64" y="928">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="86" x="63.8864" y="928.818">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="97" x="64" y="544">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="87" x="2304.09" y="1120.41">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="98" x="2304" y="352">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="88" x="2303.68" y="1504.59">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="99" x="2304" y="736">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="89" x="64.2045" y="2080.55">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="100" x="2304" y="1120">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="90" x="64.3409" y="544.909">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="101" x="2304" y="1504">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="91" x="2303.84" y="352.909">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="102" x="2304" y="1888">
+   <polyline points="0,0 32,0"/>
   </object>
-  <object id="92" x="2303.8" y="736.53">
-   <polyline points="0,0 0,30.9091 31.2727,31.0909 31.8182,-0.181818 0,-0.727273"/>
+  <object id="103" x="2304" y="2272">
+   <polyline points="0,0 32,0"/>
   </object>
  </objectgroup>
 </map>

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,6 +25,7 @@ public class ScrMenu implements Screen, InputProcessor {
     Stage stage;
     SpriteBatch batch;
     BitmapFont screenName;
+    Texture txgg;
 
     public ScrMenu(GamMenu _gamMenu) {  //Referencing the main class.
         gamMenu = _gamMenu;
@@ -45,13 +47,12 @@ public class ScrMenu implements Screen, InputProcessor {
         Gdx.input.setInputProcessor(stage);
         btnPlayListener();
         btnGameoverListener();
+        txgg = new Texture("menu.png");//menu picture
     }
 
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 1, 0, 1); //Green background.
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        screenName.draw(batch, "This is the MENU screen", 230, 275);
+         batch.begin();
+        batch.draw(txgg, 0, 0, 720, 480);
         batch.end();
         stage.act();
         stage.draw();
