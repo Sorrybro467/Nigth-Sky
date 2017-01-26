@@ -27,8 +27,17 @@ import gdx.captainpicard.utils.TiledObjUtils;
 
 import static gdx.captainpicard.utils.Constants.PPM;
 import static gdx.captainpicard.utils.Constants.jumps;
+import static gdx.captainpicard.utils.Constants.iscanopen;
+import static gdx.captainpicard.utils.Constants.iskeypicked;
+import static gdx.captainpicard.utils.items.*;
+
 
 import gdx.captainpicard.GamMenu;
+
+//----------------Soucres-----------------------------------------------
+//https://www.youtube.com/watch?v=_y1RvNWoRFU
+//https://www.youtube.com/watch?v=z35ZkkdPuMQ
+//https://www.youtube.com/watch?v=TiHx4-j0rrw
 
 public class ScrPlay extends ApplicationAdapter implements Screen {
 
@@ -41,13 +50,15 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
     private Box2DDebugRenderer b2dr;
     private World world;
     public static Body player;
+    private Body door,key;
     private Body Platform;
     private SpriteBatch Batch;
-    private Texture tex;
+    private Texture tex,texdoor,item;
     private MapProperties MapPro;
     private int nWidht, nHeight;
     private Body land;
     private TiledObjUtils tou;
+        
 
     public ScrPlay(GamMenu _gamMenu) {  //Referencing the main class.
         gamMenu = _gamMenu;
@@ -62,10 +73,15 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
         b2dr = new Box2DDebugRenderer();
 
         player = createBox(200, 140, 32, 32, false);
+        key=createBox(300,300,32,32,false);
         //Platform = createBox(140, 130, 64, 32, true);
+      //  door = createBox(300, 240, 10, 10, true);
+        
 
         Batch = new SpriteBatch();
-        tex = new Texture("nyan cat.png");
+        tex = new Texture("cat.png");//the nyan cat
+        item = new Texture("key.png");//the key
+        texdoor=new Texture("closed-door.png");//was going to be door
 
         map = new TmxMapLoader().load("world map.tmx");
         tmr = new OrthogonalTiledMapRenderer(map);
@@ -73,10 +89,10 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
         nWidht = MapPro.get("width", Integer.class);
         nHeight = MapPro.get("height", Integer.class);
 
-        tou.parsedTiledObjectLayer(world, map.getLayers().get("world border").getObjects(), false,false);
-        tou.parsedTiledObjectLayer(world, map.getLayers().get("land").getObjects(), true,false);
-        tou.parsedTiledObjectLayer(world, map.getLayers().get("levels border").getObjects(), true,false);
-        tou.parsedTiledObjectLayer(world, map.getLayers().get("jumps pad").getObjects(), true,true);
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("world border").getObjects(), false,false);//to keep the player in the game screen
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("land").getObjects(), true,false);//the floor when first spwan in
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("levels border").getObjects(), true,false);//the land segments 
+        tou.parsedTiledObjectLayer(world, map.getLayers().get("jumps pad").getObjects(), true,true);//the mushrooms you can jump on
     }
 
     @Override
@@ -95,10 +111,10 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
 
     public void update(float Delta) {
         world.step(1 / 60f, 6, 2);
-        CameraStyles.lerptotarget(camera, player.getPosition().scl(32));
+        CameraStyles.lerptotarget(camera, player.getPosition().scl(32));//cause the camera delay
         float fstartX = camera.viewportWidth / 2;
         float fstartY = camera.viewportHeight / 2;
-        CameraStyles.boundary(camera, fstartX, fstartY, nWidht * 32 - fstartX * 2, nHeight * 32 - fstartY * 2);
+        CameraStyles.boundary(camera, fstartX, fstartY, nWidht * 32 - fstartX * 2, nHeight * 32 - fstartY * 2);//allows camera boundary
         CameraUpdate(Delta);
         InputUpdate(Delta);
         tmr.setView(camera);
@@ -106,7 +122,6 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
     }
 
     public void InputUpdate(float delta) {
-        boolean godmode = false;
         int horizontalForce = 0;
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -116,7 +131,7 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
             horizontalForce += 4;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && jumps == 0) {
-            player.applyForceToCenter(0, 600, false);
+            player.applyForceToCenter(0, 400, false);
             jumps = 1;
         }
 
@@ -131,9 +146,9 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
         BodyDef def = new BodyDef();
 
         if (IsStatic) {
-            def.type = BodyDef.BodyType.StaticBody;
+            def.type = BodyDef.BodyType.StaticBody;//used if it is land
         } else {
-            def.type = BodyDef.BodyType.DynamicBody;
+            def.type = BodyDef.BodyType.DynamicBody;//used if it is player and soon items
         }
 
         FixtureDef fixturedef = new FixtureDef();
@@ -164,7 +179,9 @@ public class ScrPlay extends ApplicationAdapter implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         tmr.render();
         Batch.begin();
-        Batch.draw(tex, player.getPosition().x * PPM - (tex.getWidth() / 2), player.getPosition().y * PPM - (tex.getWidth() / 2));
+         Batch.draw(item,key.getPosition().x*PPM-(item.getWidth()/2), key.getPosition().y*PPM-(item.getWidth()/2), 32, 32);//the key
+        Batch.draw(tex, player.getPosition().x * PPM - (tex.getWidth() / 2), player.getPosition().y * PPM - (tex.getWidth() / 2));//the player
+       //Batch.draw(texdoor, door.getPosition().x * PPM - (texdoor.getWidth() / 2), door.getPosition().y * PPM - (texdoor.getWidth() / 2));
         Batch.end();
 
         b2dr.render(world, camera.combined.scl(PPM));
