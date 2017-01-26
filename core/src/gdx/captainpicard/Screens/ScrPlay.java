@@ -39,6 +39,8 @@ import gdx.captainpicard.GamMenu;
 //https://www.youtube.com/watch?v=z35ZkkdPuMQ
 //https://www.youtube.com/watch?v=TiHx4-j0rrw
 
+//-------------GitHub--------------------
+//https://github.com/Sorrybro467/Nigth-Sky
 public class ScrPlay extends ApplicationAdapter implements Screen {
 
     GamMenu gamMenu;
